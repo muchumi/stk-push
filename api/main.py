@@ -1,7 +1,7 @@
 from fastapi import FastAPI, status
 from api.db.database import Base, engine
 
-app = FastAPI()
+app = FastAPI(title="STK push API", description="A FastAPI application for M-Pesa STK Push", version="1.0.0")
 
 # Create tables
 Base.metadata.create_all(bind=engine)
