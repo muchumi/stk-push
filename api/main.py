@@ -8,4 +8,4 @@ Base.metadata.create_all(bind=engine)
 
 @app.get("/", status_code=status.HTTP_200_OK)
 def root():
-    return {"message": "Hello world"}
+    return {"message": "Hello world, welcome to STK push API"}
