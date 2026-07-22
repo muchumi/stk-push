@@ -1,7 +1,11 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
+from api.schemas.stk_schema import STKPushRequest
 
-routes = APIRouter(prefix="/stk", tags=["STK Push"])
+router = APIRouter(prefix="/stk", tags=["STK Push"])
 
-@routes.post("/push")
-def stk_push():
-    return {"message": "STK push initiated"}
+@router.post("/push")
+def stk_push(request: STKPushRequest):
+    return {
+        "message": "STK push initiated",
+        "data":request.model_dump()
+    }
