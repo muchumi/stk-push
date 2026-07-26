@@ -1,6 +1,5 @@
 import base64
 import requests
-
 from api.core.config import settings
 
 def get_access_token():
@@ -18,7 +17,8 @@ def get_access_token():
 
     response=requests.get(
         settings.OAUTH_URL,
-        headers=headers
+        headers=headers,
+        timeout=
     )
     response.raise_for_status()
     token=response.json()["access_token"]
