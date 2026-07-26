@@ -1,8 +1,6 @@
 from sqlalchemy import Column, Integer, String, Float, DateTime
 from sqlalchemy.sql import func
-
 from api.db.database import Base
-
 
 class STKTransaction(Base):
     __tablename__ = "stk_transactions"

@@ -12,7 +12,6 @@ def stk_push(request: STKPushRequest):
         amount=request.amount
     )
 
-
 """
     Endpoint to handle the callback from Safaricom Daraja API after an STK Push request is initiated.
 """

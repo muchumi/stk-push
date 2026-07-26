@@ -9,7 +9,6 @@ from api.core.config import setting
 def generate_timestamp()->str:
     return datetime.now().strftime("%Y%m%d%H%M%S")
 
-
 def generate_password(timestamp:str)->str:
     password=(
         setting.BUSINESS_SHORT_CODE +
