@@ -1,16 +1,29 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, Depends
+from sqlalchemy.orm import Session
+from api.db.database import get_db
+from api.models.stk_transaction import STKTransaction 
 from api.schemas.stk_schema import STKPushRequest
-from api.services.stk_helpers import generate_timestamp, generate_password
 from api.services.stk_push import initiate_stk_push
 
 router = APIRouter(prefix="/stk", tags=["STK Push"])
 
 @router.post("/push")
-def stk_push(request: STKPushRequest):
-    return initiate_stk_push(
+def stk_push(request: STKPushRequest, db: Session = Depends(get_db)):
+    response= initiate_stk_push(
         phone_number=request.phone_number,
         amount=request.amount
     )
+    transaction=STKTransaction(
+        phone_number=request.phone_number,
+        amount=request.amount,
+        merchant_request_id=response.get("MerchantRequestID"),
+        checkout_request_id=response.get("CheckoutRequestID"),
+        status="pending"
+    )
+    db.add(transaction)
+    db.commit()
+    db.refresh(transaction)
+    return response
 
 """
     Endpoint to handle the callback from Safaricom Daraja API after an STK Push request is initiated.
