@@ -12,3 +12,17 @@ def stk_push(request: STKPushRequest):
         amount=request.amount
     )
 
+
+"""
+    Endpoint to handle the callback from Safaricom Daraja API after an STK Push request is initiated.
+"""
+@router.post("/callback")
+async def stk_callback(request: Request):
+    callback_data=await request.json()
+    print(callback_data)
+    return {
+        "ResultCode": 0,
+        "ResultDesc": "Accepted" 
+    }
+
+
