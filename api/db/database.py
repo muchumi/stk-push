@@ -9,7 +9,7 @@ engine = create_engine(
 
 """
     Creating session factory.
-    SessionLocal creates a real database session that allows us to insert, query, update and delete data.
+    sessionmaker creates a real database session that allows us to insert, query, update and delete data.
     Allows interaction with the database.
 """
 SessionLocal=sessionmaker(
