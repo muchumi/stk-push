@@ -1,14 +1,15 @@
 import base64
 import requests
+from api.core.config import setting
 from fastapi import HTTPException, status
-from api.core.config import settings
+
 
 def get_access_token():
     """
-        Generate an OAuth access token from Sfaricom Daraja API.
+        Generate an OAuth access token from Safaricom Daraja API.
     """
     # Combining consumer key consumer secret to create a base64 encoded string
-    credentials=f"{settings.CONSUMER_KEY}:{settings.CONSUMER_SECRET}"
+    credentials=f"{setting.CONSUMER_KEY}:{setting.CONSUMER_SECRET}"
     # Encode the credentials to base64
     encoded_credentials=base64.b64encode(credentials.encode()).decode()
 
@@ -17,7 +18,7 @@ def get_access_token():
     }
     try:
         response=requests.get(
-            settings.OAUTH_URL,
+            setting.OAUTH_URL,
             headers=headers,
             timeout=10
         )
