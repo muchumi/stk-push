@@ -8,7 +8,7 @@ class STKTransaction(Base):
     id = Column(Integer, primary_key=True, index=True)
     merchant_request_id = Column(String, nullable=True)
     checkout_request_id = Column(String, unique=True, nullable=True)
-    phone_number = Column(String, nullable=False)
+    phoneNumber = Column(String, nullable=False)
     amount = Column(Float, nullable=False)
     status = Column(String, default="Pending")
     mpesa_receipt_number = Column(String, nullable=True)
