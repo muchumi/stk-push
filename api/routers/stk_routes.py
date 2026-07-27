@@ -2,7 +2,7 @@ from fastapi import APIRouter, Request, Depends
 from sqlalchemy.orm import Session
 from api.db.database import get_db
 from api.models.stk_transaction import STKTransaction 
-from api.schemas.stk_schema import STKPushRequest
+from api.schemas.STKPushRequest import STKPushRequest
 from api.services.stk_push import initiate_stk_push
 
 router = APIRouter(prefix="/stk", tags=["STK Push"])
@@ -10,11 +10,11 @@ router = APIRouter(prefix="/stk", tags=["STK Push"])
 @router.post("/push")
 def stk_push(request: STKPushRequest, db: Session = Depends(get_db)):
     response= initiate_stk_push(
-        phone_number=request.phone_number,
+        phoneNumber=request.phoneNumber,
         amount=request.amount
     )
     transaction=STKTransaction(
-        phone_number=request.phone_number,
+        phoneNumber=request.phoneNumber,
         amount=request.amount,
         merchant_request_id=response.get("MerchantRequestID"),
         checkout_request_id=response.get("CheckoutRequestID"),
