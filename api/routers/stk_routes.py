@@ -29,12 +29,24 @@ def stk_push(request: STKPushRequest, db: Session = Depends(get_db)):
     Endpoint to handle the callback from Safaricom Daraja API after an STK Push request is initiated.
 """
 @router.post("/callback")
-async def stk_callback(request: Request):
+async def stk_callback(request: Request, db: Session = Depends(get_db)):
     callback_data=await request.json()
-    print(callback_data)
+    stk_callback=callback_data["Body"]["stkCallback"]
+    checkout_request_id=stk_callback["CheckoutRequestID"]
+    result_code=stk_callback["ResultCode"]
+    result_desc=stk_callback["ResultDesc"]
+
+    transaction=(db.query(STKTransaction).filter(STKTransaction.checkout_request_id==checkout_request_id).first())
+    if transaction:
+        if result_code==0:
+            transaction.status="success"
+        else:
+            transaction.status="failed"
+    db.commit()
     return {
         "ResultCode": 0,
-        "ResultDesc": "Accepted" 
-    }
+        "ResultDesc": "Accepted",
+        "message": "Callback received and processed successfully."
+    }            
 
 
