@@ -51,6 +51,10 @@ async def stk_callback(request: Request, db: Session = Depends(get_db)):
     }            
 
 
+"""
+    This endpoint/route acts as a transaction status checker.
+    It allows our application to ask Safaricom for the current status of a specific STK 
+"""
 @router.get("/status/{checkout_request_id}")
 def stk_status(
     checkout_request_id: str,
