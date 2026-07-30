@@ -4,6 +4,7 @@ from api.db.database import get_db
 from api.models.stk_transaction import STKTransaction 
 from api.schemas.STKPushRequest import STKPushRequest
 from api.services.stk_push import initiate_stk_push
+from api.services.stk_query import query_stk_status
 
 router = APIRouter(prefix="/stk", tags=["STK Push"])
 
@@ -50,3 +51,34 @@ async def stk_callback(request: Request, db: Session = Depends(get_db)):
     }            
 
 
+@router.get("/status/{checkout_request_id}")
+def stk_status(
+    checkout_request_id: str,
+    db: Session = Depends(get_db)
+):
+    response = query_stk_status(checkout_request_id)
+
+    transaction = (
+        db.query(STKTransaction)
+        .filter(
+            STKTransaction.checkout_request_id == checkout_request_id
+        )
+        .first()
+    )
+
+    if transaction:
+
+        result_code = response.get("ResultCode")
+        result_desc = response.get("ResultDesc")
+
+        transaction.result_desc = result_desc
+
+        if result_code == "0" or result_code == 0:
+            transaction.status = "success"
+        else:
+            transaction.status = "failed"
+
+        db.commit()
+        db.refresh(transaction)
+
+    return response
