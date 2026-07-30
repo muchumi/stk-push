@@ -12,5 +12,6 @@ class Settings:
     STK_PUSH_URL = os.getenv("STK_PUSH_URL")
     CALLBACK_URL = os.getenv("CALLBACK_URL")
     BASE_URL="https://sandbox.safaricom.co.ke"
+    STK_QUERY_URL=os.getenv("STK_QUERY_URL")
 
 setting=Settings()
