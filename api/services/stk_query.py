@@ -21,20 +21,20 @@ def query_stk_status(checkout_request_id: str):
         "Timestamp": timestamp,
         "CheckoutRequestID": checkout_request_id
     }
-
-    response=requests.post(
-        setting.STK_QUERY_URL, 
-        json=payload, 
-        headers=headers,
-        timeout=30
-    )
-
-    if response.status_code != 200:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=response.text
+    try:
+        response=requests.post(
+            setting.STK_QUERY_URL, 
+            json=payload, 
+            headers=headers,
+            timeout=30
         )
-    return response.json()
+        response.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=f"Failed to connect to Safaricom Daraja API: {str(e)}"
+        )    
 
+  
 
 
