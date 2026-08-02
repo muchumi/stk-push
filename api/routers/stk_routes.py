@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from api.db.database import get_db
 from api.models.stk_transaction import STKTransaction 
 from api.schemas.STKPushRequest import STKPushRequest
+from api.schemas.STKTransaction import STKTransactionResponse
 from api.services.stk_push import initiate_stk_push
 from api.services.stk_query import query_stk_status
 
@@ -91,22 +92,22 @@ def stk_status(
 """
     This endpoint/route gets all transactions from the database.
 """
-@router.get("/transactions", status_code=status.HTTP_200_OK)
+@router.get("/transactions", response_model=list[STKTransactionResponse],status_code=status.HTTP_200_OK)
 def get_all_transactions(db: Session = Depends(get_db)):
     transactions = db.query(STKTransaction).all()
-    return {
-        "count": len(transactions),
-        "transactions": transactions
-    }
+    return transactions
 
 
 """
     This endpoint/route gets a single transaction by id.
     It is used in retrieving single transaction results.
 """
-@router.get("/transactions/{transaction_id}", status_code=status.HTTP_200_OK)
+@router.get("/transactions/{transaction_id}", response_model=STKTransactionResponse, status_code=status.HTTP_200_OK)
 def get_single_transaction(transaction_id: int, db: Session = Depends(get_db)):
     single_transaction=db.query(STKTransaction).filter(STKTransaction.id==transaction_id).first()
     if not single_transaction:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Transaction resource not found")
     return single_transaction
+
+
+
