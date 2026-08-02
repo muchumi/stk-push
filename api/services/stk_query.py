@@ -25,7 +25,8 @@ def query_stk_status(checkout_request_id: str):
     response=requests.post(
         setting.STK_QUERY_URL, 
         json=payload, 
-        headers=headers
+        headers=headers,
+        timeout=30
     )
 
     if response.status_code != 200:
