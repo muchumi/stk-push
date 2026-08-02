@@ -88,3 +88,13 @@ def stk_status(
     return response
 
 
+"""
+    This endpoint/route gets all transactions from the database.
+"""
+@router.get("/transactions", status_code=status.HTTP_200_OK)
+def get_all_transactions(db: Session = Depends(get_db)):
+    transactions = db.query(STKTransaction).all()
+    return {
+        "count": len(transactions),
+        "transactions": transactions
+    }
