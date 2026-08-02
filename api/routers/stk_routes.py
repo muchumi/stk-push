@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request, Depends
+from fastapi import APIRouter, Request, Depends, status, HTTPException
 from sqlalchemy.orm import Session
 from api.db.database import get_db
 from api.models.stk_transaction import STKTransaction 
@@ -98,3 +98,15 @@ def get_all_transactions(db: Session = Depends(get_db)):
         "count": len(transactions),
         "transactions": transactions
     }
+
+
+"""
+    This endpoint/route gets a single transaction by id.
+    It is used in retrieving single transaction results.
+"""
+@router.get("/transactions/{transaction_id}", status_code=status.HTTP_200_OK)
+def get_single_transaction(transaction_id: int, db: Session = Depends(get_db)):
+    single_transaction=db.query(STKTransaction).filter(STKTransaction.id==transaction_id).first()
+    if not single_transaction:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Transaction resource not found")
+    return single_transaction
