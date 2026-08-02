@@ -8,7 +8,7 @@ from api.services.auth import get_access_token
 def query_stk_status(checkout_request_id: str):
     access_token=get_access_token()
     timestamp=datetime.now().strftime("%Y%m%d%H%M%S")
-    password=base64.b64encode(f"{setting.SHORTCODE}{setting.PASSKEY}{timestamp}".encode()).decode()
+    password=base64.b64encode(f"{setting.BUSINESS_SHORT_CODE}{setting.PASSKEY}{timestamp}".encode()).decode()
 
     headers={
         "Authorization": f"Bearer {access_token}",
@@ -34,3 +34,6 @@ def query_stk_status(checkout_request_id: str):
             detail=response.text
         )
     return response.json()
+
+
+
