@@ -41,10 +41,18 @@ async def stk_callback(request: Request, db: Session = Depends(get_db)):
     transaction=(db.query(STKTransaction).filter(STKTransaction.checkout_request_id==checkout_request_id).first())
     if transaction:
         if result_code==0:
+            metadata=stk_callback["CallbackMetadata"]["Item"]
+            data={}
+            for item in metadata:
+                data[item["Name"]]=item.get("Value")
             transaction.status="success"
+            transaction.phoneNumber=data.get("PhoneNumber")
+            transaction.mpesa_receipt_number=data.get("MpesaReceiptNumber")
+            transaction.transaction_date=data.get("TransactionDate")    
         else:
             transaction.status="failed"
     db.commit()
+    db.refresh(transaction)
     return {
         "ResultCode": 0,
         "ResultDesc": "Accepted",
