@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Request, Depends, status, HTTPException
 from sqlalchemy.orm import Session
 from api.db.database import get_db
+from typing import Optional
 from api.models.stk_transaction import STKTransaction 
 from api.schemas.STKPushRequest import STKPushRequest
 from api.schemas.STKTransaction import STKTransactionResponse
@@ -118,4 +119,21 @@ def get_single_transaction(transaction_id: int, db: Session = Depends(get_db)):
     return single_transaction
 
 
+"""
+    This endpoint/route enables searching for transactions.
+"""
+@router.get("/transactions/search", response_model=list[STKTransactionResponse], status_code=status.HTTP_200_OK)
+def search_transactions(phoneNumber: Optional[str]=None, status: Optional[str]=None, checkout_request_id: Optional[str]=None, merchant_request_id: Optional[str]=None, mpesa_receipt_number: Optional[str]=None, db: Session = Depends(get_db)):
+    query=db.query(STKTransaction)
+    if phoneNumber:
+        query=query.filter(STKTransaction.phoneNumber==phoneNumber)
+    if status:
+        query=query.filter(STKTransaction.status==status)
+    if checkout_request_id:
+        query=query.filter(STKTransaction.checkout_request_id==checkout_request_id)
+    if merchant_request_id:
+        query=query.filter(STKTransaction.merchant_request_id==merchant_request_id)
+    if mpesa_receipt_number:
+        query=query.filter(STKTransaction.mpesa_receipt_number==mpesa_receipt_number)
 
+    return query.all()        
