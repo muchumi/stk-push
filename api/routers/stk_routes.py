@@ -52,8 +52,8 @@ async def stk_callback(request: Request, db: Session = Depends(get_db)):
             transaction.transaction_date=data.get("TransactionDate")    
         else:
             transaction.status="failed"
-    db.commit()
-    db.refresh(transaction)
+        db.commit()
+        db.refresh(transaction)
     return {
         "ResultCode": 0,
         "ResultDesc": "Accepted",
@@ -69,7 +69,7 @@ async def stk_callback(request: Request, db: Session = Depends(get_db)):
 def stk_status(
     checkout_request_id: str,
     db: Session = Depends(get_db)
-):
+    ):
     response = query_stk_status(checkout_request_id)
 
     transaction = (
@@ -91,7 +91,6 @@ def stk_status(
             transaction.status = "success"
         else:
             transaction.status = "failed"
-
         db.commit()
         db.refresh(transaction)
 
@@ -105,18 +104,6 @@ def stk_status(
 def get_all_transactions(db: Session = Depends(get_db)):
     transactions = db.query(STKTransaction).all()
     return transactions
-
-
-"""
-    This endpoint/route gets a single transaction by id.
-    It is used in retrieving single transaction results.
-"""
-@router.get("/transactions/{transaction_id}", response_model=STKTransactionResponse, status_code=status.HTTP_200_OK)
-def get_single_transaction(transaction_id: int, db: Session = Depends(get_db)):
-    single_transaction=db.query(STKTransaction).filter(STKTransaction.id==transaction_id).first()
-    if not single_transaction:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Transaction resource not found")
-    return single_transaction
 
 
 """
@@ -136,4 +123,19 @@ def search_transactions(phoneNumber: Optional[str]=None, status: Optional[str]=N
     if mpesa_receipt_number:
         query=query.filter(STKTransaction.mpesa_receipt_number==mpesa_receipt_number)
 
-    return query.all()        
+    return query.all() 
+
+
+"""
+    This endpoint/route gets a single transaction by id.
+    It is used in retrieving single transaction results.
+"""
+@router.get("/transactions/{transaction_id}", response_model=STKTransactionResponse, status_code=status.HTTP_200_OK)
+def get_single_transaction(transaction_id: int, db: Session = Depends(get_db)):
+    single_transaction=db.query(STKTransaction).filter(STKTransaction.id==transaction_id).first()
+    if not single_transaction:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Transaction resource not found")
+    return single_transaction
+
+
+    
