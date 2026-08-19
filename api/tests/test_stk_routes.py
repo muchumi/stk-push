@@ -6,7 +6,7 @@ def test_root(client):
     }
 
 
-
+# Testing stk push endpoint
 def test_stk_push(client, monkeypatch):
     def mock_initiate_stk_push(phoneNumber, amount):
         return {
