@@ -10,7 +10,7 @@ from api.services.stk_query import query_stk_status
 
 router = APIRouter(prefix="/stk", tags=["STK Push"])
 
-@router.post("/push")
+@router.post("/push", response_model=STKTransactionResponse)
 def stk_push(request: STKPushRequest, db: Session = Depends(get_db)):
     response= initiate_stk_push(
         phoneNumber=request.phoneNumber,
@@ -26,7 +26,7 @@ def stk_push(request: STKPushRequest, db: Session = Depends(get_db)):
     db.add(transaction)
     db.commit()
     db.refresh(transaction)
-    return response
+    return transaction
 
 """
     Endpoint to handle the callback from Safaricom Daraja API after an STK Push request is initiated.
