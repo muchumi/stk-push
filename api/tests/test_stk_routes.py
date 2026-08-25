@@ -234,3 +234,34 @@ def test_get_all_transactions(client, db):
     assert len(data) == 2
     assert data[0]["phoneNumber"] == "254719271870"
     assert data[1]["phoneNumber"] == "254712345678"
+
+
+# Testing get single transaction
+def test_get_single_transaction(client, db):
+
+    transaction = STKTransaction(
+        phoneNumber="254719271870",
+        amount=100,
+        merchant_request_id="MERCHANT-003",
+        checkout_request_id="CHECKOUT-003",
+        status="pending"
+    )
+
+    db.add(transaction)
+    db.commit()
+    db.refresh(transaction)
+
+    response = client.get(
+        f"/stk/transactions/{transaction.id}"
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert data["id"] == transaction.id
+    assert data["phoneNumber"] == "254719271870"
+    assert data["amount"] == 100
+    assert data["checkout_request_id"] == "CHECKOUT-003"
+    assert data["status"] == "pending"
+
