@@ -203,3 +203,34 @@ def test_stk_callback_unknown_transaction(client):
     assert data["ResultDesc"] == "Accepted"
     assert data["message"] == "Callback received and processed successfully."
 
+# Testing get all transactions
+def test_get_all_transactions(client, db):
+
+    transaction1 = STKTransaction(
+        phoneNumber="254719271870",
+        amount=100,
+        merchant_request_id="MERCHANT-001",
+        checkout_request_id="CHECKOUT-001",
+        status="success"
+    )
+
+    transaction2 = STKTransaction(
+        phoneNumber="254712345678",
+        amount=200,
+        merchant_request_id="MERCHANT-002",
+        checkout_request_id="CHECKOUT-002",
+        status="pending"
+    )
+
+    db.add_all([transaction1, transaction2])
+    db.commit()
+
+    response = client.get("/stk/transactions")
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert len(data) == 2
+    assert data[0]["phoneNumber"] == "254719271870"
+    assert data[1]["phoneNumber"] == "254712345678"
