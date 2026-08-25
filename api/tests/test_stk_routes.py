@@ -265,3 +265,15 @@ def test_get_single_transaction(client, db):
     assert data["checkout_request_id"] == "CHECKOUT-003"
     assert data["status"] == "pending"
 
+
+# Testing single transaction not found
+def test_get_single_transaction_not_found(client):
+
+    response = client.get("/stk/transactions/99999")
+
+    assert response.status_code == 404
+
+    data = response.json()
+
+    assert data["detail"] == "Transaction resource not found"
+
