@@ -302,4 +302,5 @@ def test_search_transactions_by_phone_number(client, db):
 
     assert len(data)==1
     assert data[0]["phoneNumber"]=="254719271870"
-    assert data[0]["amount"]==100
+    assert data[0]["amount"] == 100
+
