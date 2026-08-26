@@ -277,3 +277,29 @@ def test_get_single_transaction_not_found(client):
 
     assert data["detail"] == "Transaction resource not found"
 
+# Testing transaction search with phone number
+def test_search_transactions_by_phone_number(client, db):
+    transaction_one=STKTransaction(
+        phoneNumber="254719271870",
+        amount=100,
+        merchant_request_id="MERCHANT-001",
+        checkout_request_id="CHECKOUT-001",
+        status="success"
+    )
+    transaction_two=STKTransaction(
+        phoneNumber="254712345678",
+        amount=200,
+        merchant_request_id="MERCHANT-002",
+        checkout_request_id="CHECKOUT-002",
+        status="pending"
+    )
+    db.add_all([transaction_one, transaction_two])
+    db.commit()
+
+    response=client.get("/stk/transactions/search?phoneNumber=254719271870")
+    assert response.status_code==200
+    data=response.json()
+
+    assert len(data)==1
+    assert data[0]["phoneNumber"]=="254719271870"
+    assert data[0]["amount"]==100
