@@ -371,3 +371,38 @@ def test_search_transactions_by_checkout_request_id(client, db):
     assert len(data) == 1
     assert data[0]["checkout_request_id"] == "CHECKOUT-001"
     assert data[0]["phoneNumber"] == "254719271870"
+
+
+# Testing transaction search by merchant request ID
+def test_search_transactions_by_merchant_request_id(client, db):
+
+    transaction_one = STKTransaction(
+        phoneNumber="254719271870",
+        amount=100,
+        merchant_request_id="MERCHANT-001",
+        checkout_request_id="CHECKOUT-001",
+        status="success"
+    )
+
+    transaction_two = STKTransaction(
+        phoneNumber="254712345678",
+        amount=200,
+        merchant_request_id="MERCHANT-002",
+        checkout_request_id="CHECKOUT-002",
+        status="pending"
+    )
+
+    db.add_all([transaction_one, transaction_two])
+    db.commit()
+
+    response = client.get(
+        "/stk/transactions/search?merchant_request_id=MERCHANT-002"
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert len(data) == 1
+    assert data[0]["merchant_request_id"] == "MERCHANT-002"
+    assert data[0]["phoneNumber"] == "254712345678"
