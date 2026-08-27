@@ -10,6 +10,7 @@ class STKTransactionResponse(BaseModel):
     amount: float
     merchant_request_id: str | None
     checkout_request_id: str | None
+    mpesa_receipt_number: str | None
     status: str
     result_desc: str | None
 
