@@ -406,3 +406,65 @@ def test_search_transactions_by_merchant_request_id(client, db):
     assert len(data) == 1
     assert data[0]["merchant_request_id"] == "MERCHANT-002"
     assert data[0]["phoneNumber"] == "254712345678"
+
+
+# Testing transaction search by M-Pesa receipt number
+def test_search_transactions_by_mpesa_receipt_number(client, db):
+
+    transaction_one = STKTransaction(
+        phoneNumber="254719271870",
+        amount=100,
+        merchant_request_id="MERCHANT-001",
+        checkout_request_id="CHECKOUT-001",
+        mpesa_receipt_number="RECEIPT-001",
+        status="success"
+    )
+
+    transaction_two = STKTransaction(
+        phoneNumber="254712345678",
+        amount=200,
+        merchant_request_id="MERCHANT-002",
+        checkout_request_id="CHECKOUT-002",
+        mpesa_receipt_number="RECEIPT-002",
+        status="success"
+    )
+
+    db.add_all([transaction_one, transaction_two])
+    db.commit()
+
+    response = client.get(
+        "/stk/transactions/search?mpesa_receipt_number=RECEIPT-001"
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert len(data) == 1
+    assert data[0]["mpesa_receipt_number"] == "RECEIPT-001"
+    assert data[0]["phoneNumber"] == "254719271870"
+
+
+# Testing transaction search with no matching transaction
+def test_search_transactions_no_match(client, db):
+
+    transaction = STKTransaction(
+        phoneNumber="254719271870",
+        amount=100,
+        merchant_request_id="MERCHANT-001",
+        checkout_request_id="CHECKOUT-001",
+        status="success"
+    )
+
+    db.add(transaction)
+    db.commit()
+
+    response = client.get(
+        "/stk/transactions/search?phoneNumber=254700000000"
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert data == []
