@@ -468,3 +468,18 @@ def test_search_transactions_no_match(client, db):
     data = response.json()
 
     assert data == []
+
+# Testing STK push with zero amount
+def test_stk_push_zero_amount(client):
+
+    response = client.post(
+        "/stk/push",
+        json={
+            "phoneNumber": "254719271870",
+            "amount": 0,
+            "accountReference": "TEST001",
+            "transactionDescription": "Test payment"
+        }
+    )
+
+    assert response.status_code == 422
