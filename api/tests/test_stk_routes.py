@@ -483,3 +483,18 @@ def test_stk_push_zero_amount(client):
     )
 
     assert response.status_code == 422
+
+
+# Testing STK push with missing phone number
+def test_stk_push_missing_phone_number(client):
+
+    response = client.post(
+        "/stk/push",
+        json={
+            "amount": 100,
+            "accountReference": "TEST001",
+            "transactionDescription": "Test payment"
+        }
+    )
+
+    assert response.status_code == 422
