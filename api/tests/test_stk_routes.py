@@ -542,3 +542,39 @@ def test_stk_push_missing_transaction_description(client):
     )
 
     assert response.status_code == 422
+
+
+# Testing failed STK push
+def test_stk_push_failed(client, monkeypatch):
+    def mock_initiate_stk_push(phoneNumber, amount):
+        return {
+            "MerchantRequestID": "TEST-MERCHANT-FAILED",
+            "CheckoutRequestID": "TEST-CHECKOUT-FAILED",
+            "ResponseCode": "1",
+            "ResponseDescription": "Failed",
+            "CustomerMessage": "Request failed"
+        }
+
+    monkeypatch.setattr(
+        "api.routers.stk_routes.initiate_stk_push",
+        mock_initiate_stk_push
+    )
+
+    response = client.post(
+        "/stk/push",
+        json={
+            "phoneNumber": "254719271870",
+            "amount": 100,
+            "accountReference": "TEST001",
+            "transactionDescription": "Test payment"
+        }
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert data["phoneNumber"] == "254719271870"
+    assert data["amount"] == 100
+    assert data["merchant_request_id"] == "TEST-MERCHANT-FAILED"
+    assert data["checkout_request_id"] == "TEST-CHECKOUT-FAILED"
