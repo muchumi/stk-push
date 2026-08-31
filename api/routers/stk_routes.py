@@ -16,6 +16,7 @@ router = APIRouter(prefix="/stk", tags=["STK Push"])
 """
 @router.post("/push", response_model=STKTransactionResponse)
 def stk_push(request: STKPushRequest, db: Session = Depends(get_db)):
+    # Initiating the STK Push
     response= initiate_stk_push(
         phoneNumber=request.phoneNumber,
         amount=request.amount
