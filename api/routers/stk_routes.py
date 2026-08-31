@@ -12,7 +12,7 @@ router = APIRouter(prefix="/stk", tags=["STK Push"])
 
 """
     This is the STK Push API endpoint.It is used to initiate an STK Push to Safaricom Daraja API after receiving a payment request.
-    It saves the transaction details in the database and return the saved transaction details as a response to the client.
+    It saves the transaction details in the database and returns the saved transaction details as a response to the client.
 """
 @router.post("/push", response_model=STKTransactionResponse, status_code=status.HTTP_201_CREATED)
 def stk_push(request: STKPushRequest, db: Session = Depends(get_db)):
