@@ -1,7 +1,6 @@
 from fastapi import FastAPI, status
 from api.db.database import Base, engine
 from api.routers.stk_routes import router
-from api.models.stk_transaction import STKTransaction
 
 app = FastAPI(title="STK push API", description="A FastAPI application for M-Pesa STK Push", version="1.0.0")
 app.include_router(router)
