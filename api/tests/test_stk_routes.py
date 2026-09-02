@@ -27,7 +27,7 @@ def test_stk_push(client, monkeypatch):
     response = client.post(
         "/stk/push",
         json={
-            "phoneNumber": "254719271870",
+            "phoneNumber": "+254719271870",
             "amount": 100,
             "accountReference": "TEST001",
             "transactionDescription": "Test payment"
@@ -38,7 +38,7 @@ def test_stk_push(client, monkeypatch):
 
     data = response.json()
 
-    assert data["phoneNumber"] == "254719271870"
+    assert data["phoneNumber"] == "+254719271870"
     assert data["amount"] == 100
     assert data["merchant_request_id"] == "TEST-MERCHANT-123"
     assert data["checkout_request_id"] == "TEST-CHECKOUT-123"
@@ -49,7 +49,7 @@ def test_stk_push(client, monkeypatch):
 def test_stk_callback_success(client, db):
     # Create a transaction first
     transaction = STKTransaction(
-        phoneNumber="254719271870",
+        phoneNumber="+254719271870",
         amount=100,
         merchant_request_id="TEST-MERCHANT-123",
         checkout_request_id="TEST-CHECKOUT-123",
@@ -83,7 +83,7 @@ def test_stk_callback_success(client, db):
                         },
                         {
                             "Name": "PhoneNumber",
-                            "Value": 254719271870
+                            "Value": "+254719271870"
                         }
                     ]
                 }
@@ -108,7 +108,7 @@ def test_stk_callback_success(client, db):
     db.refresh(transaction)
 
     assert transaction.status == "success"
-    assert transaction.phoneNumber == "254719271870"
+    assert transaction.phoneNumber == "+254719271870"
     assert transaction.mpesa_receipt_number == "TEST123ABC"
     assert transaction.transaction_date == 20260824123045
 
@@ -117,7 +117,7 @@ def test_stk_callback_success(client, db):
 def test_stk_callback_failed(client, db):
     # Create a pending transaction
     transaction = STKTransaction(
-        phoneNumber="254719271870",
+        phoneNumber="+254719271870",
         amount=100,
         merchant_request_id="TEST-MERCHANT-456",
         checkout_request_id="TEST-CHECKOUT-456",
@@ -182,7 +182,7 @@ def test_stk_callback_unknown_transaction(client):
                         },
                         {
                             "Name": "PhoneNumber",
-                            "Value": 254719271870
+                            "Value": "+254719271870"
                         }
                     ]
                 }
@@ -207,7 +207,7 @@ def test_stk_callback_unknown_transaction(client):
 def test_get_all_transactions(client, db):
 
     transaction1 = STKTransaction(
-        phoneNumber="254719271870",
+        phoneNumber="+254719271870",
         amount=100,
         merchant_request_id="MERCHANT-001",
         checkout_request_id="CHECKOUT-001",
@@ -215,7 +215,7 @@ def test_get_all_transactions(client, db):
     )
 
     transaction2 = STKTransaction(
-        phoneNumber="254712345678",
+        phoneNumber="+254712345678",
         amount=200,
         merchant_request_id="MERCHANT-002",
         checkout_request_id="CHECKOUT-002",
@@ -232,15 +232,15 @@ def test_get_all_transactions(client, db):
     data = response.json()
 
     assert len(data) == 2
-    assert data[0]["phoneNumber"] == "254719271870"
-    assert data[1]["phoneNumber"] == "254712345678"
+    assert data[0]["phoneNumber"] == "+254719271870"
+    assert data[1]["phoneNumber"] == "+254712345678"
 
 
 # Testing get single transaction
 def test_get_single_transaction(client, db):
 
     transaction = STKTransaction(
-        phoneNumber="254719271870",
+        phoneNumber="+254719271870",
         amount=100,
         merchant_request_id="MERCHANT-003",
         checkout_request_id="CHECKOUT-003",
@@ -260,7 +260,7 @@ def test_get_single_transaction(client, db):
     data = response.json()
 
     assert data["id"] == transaction.id
-    assert data["phoneNumber"] == "254719271870"
+    assert data["phoneNumber"] == "+254719271870"
     assert data["amount"] == 100
     assert data["checkout_request_id"] == "CHECKOUT-003"
     assert data["status"] == "pending"
@@ -280,14 +280,14 @@ def test_get_single_transaction_not_found(client):
 # Testing transaction search with phone number
 def test_search_transactions_by_phone_number(client, db):
     transaction_one=STKTransaction(
-        phoneNumber="254719271870",
+        phoneNumber="+254719271870",
         amount=100,
         merchant_request_id="MERCHANT-001",
         checkout_request_id="CHECKOUT-001",
         status="success"
     )
     transaction_two=STKTransaction(
-        phoneNumber="254712345678",
+        phoneNumber="+254712345678",
         amount=200,
         merchant_request_id="MERCHANT-002",
         checkout_request_id="CHECKOUT-002",
@@ -296,12 +296,12 @@ def test_search_transactions_by_phone_number(client, db):
     db.add_all([transaction_one, transaction_two])
     db.commit()
 
-    response=client.get("/stk/transactions/search?phoneNumber=254719271870")
+    response=client.get("/stk/transactions/search?phoneNumber=%2B254719271870")
     assert response.status_code==200
     data=response.json()
 
     assert len(data)==1
-    assert data[0]["phoneNumber"]=="254719271870"
+    assert data[0]["phoneNumber"]=="+254719271870"
     assert data[0]["amount"] == 100
 
 
@@ -309,7 +309,7 @@ def test_search_transactions_by_phone_number(client, db):
 def test_search_transactions_by_status(client, db):
 
     transaction_one = STKTransaction(
-        phoneNumber="254719271870",
+        phoneNumber="+254719271870",
         amount=100,
         merchant_request_id="MERCHANT-001",
         checkout_request_id="CHECKOUT-001",
@@ -317,7 +317,7 @@ def test_search_transactions_by_status(client, db):
     )
 
     transaction_two = STKTransaction(
-        phoneNumber="254712345678",
+        phoneNumber="+254712345678",
         amount=200,
         merchant_request_id="MERCHANT-002",
         checkout_request_id="CHECKOUT-002",
@@ -340,9 +340,8 @@ def test_search_transactions_by_status(client, db):
 
 # Testing transaction search by checkout request ID
 def test_search_transactions_by_checkout_request_id(client, db):
-
     transaction_one = STKTransaction(
-        phoneNumber="254719271870",
+        phoneNumber="+254719271870",
         amount=100,
         merchant_request_id="MERCHANT-001",
         checkout_request_id="CHECKOUT-001",
@@ -350,7 +349,7 @@ def test_search_transactions_by_checkout_request_id(client, db):
     )
 
     transaction_two = STKTransaction(
-        phoneNumber="254712345678",
+        phoneNumber="+254712345678",
         amount=200,
         merchant_request_id="MERCHANT-002",
         checkout_request_id="CHECKOUT-002",
@@ -370,14 +369,14 @@ def test_search_transactions_by_checkout_request_id(client, db):
 
     assert len(data) == 1
     assert data[0]["checkout_request_id"] == "CHECKOUT-001"
-    assert data[0]["phoneNumber"] == "254719271870"
+    assert data[0]["phoneNumber"] == "+254719271870"
 
 
 # Testing transaction search by merchant request ID
 def test_search_transactions_by_merchant_request_id(client, db):
 
     transaction_one = STKTransaction(
-        phoneNumber="254719271870",
+        phoneNumber="+254719271870",
         amount=100,
         merchant_request_id="MERCHANT-001",
         checkout_request_id="CHECKOUT-001",
@@ -385,7 +384,7 @@ def test_search_transactions_by_merchant_request_id(client, db):
     )
 
     transaction_two = STKTransaction(
-        phoneNumber="254712345678",
+        phoneNumber="+254712345678",
         amount=200,
         merchant_request_id="MERCHANT-002",
         checkout_request_id="CHECKOUT-002",
@@ -405,14 +404,14 @@ def test_search_transactions_by_merchant_request_id(client, db):
 
     assert len(data) == 1
     assert data[0]["merchant_request_id"] == "MERCHANT-002"
-    assert data[0]["phoneNumber"] == "254712345678"
+    assert data[0]["phoneNumber"] == "+254712345678"
 
 
 # Testing transaction search by M-Pesa receipt number
 def test_search_transactions_by_mpesa_receipt_number(client, db):
 
     transaction_one = STKTransaction(
-        phoneNumber="254719271870",
+        phoneNumber="+254719271870",
         amount=100,
         merchant_request_id="MERCHANT-001",
         checkout_request_id="CHECKOUT-001",
@@ -421,7 +420,7 @@ def test_search_transactions_by_mpesa_receipt_number(client, db):
     )
 
     transaction_two = STKTransaction(
-        phoneNumber="254712345678",
+        phoneNumber="+254712345678",
         amount=200,
         merchant_request_id="MERCHANT-002",
         checkout_request_id="CHECKOUT-002",
@@ -442,14 +441,14 @@ def test_search_transactions_by_mpesa_receipt_number(client, db):
 
     assert len(data) == 1
     assert data[0]["mpesa_receipt_number"] == "RECEIPT-001"
-    assert data[0]["phoneNumber"] == "254719271870"
+    assert data[0]["phoneNumber"] == "+254719271870"
 
 
 # Testing transaction search with no matching transaction
 def test_search_transactions_no_match(client, db):
 
     transaction = STKTransaction(
-        phoneNumber="254719271870",
+        phoneNumber="+254719271870",
         amount=100,
         merchant_request_id="MERCHANT-001",
         checkout_request_id="CHECKOUT-001",
@@ -460,7 +459,7 @@ def test_search_transactions_no_match(client, db):
     db.commit()
 
     response = client.get(
-        "/stk/transactions/search?phoneNumber=254700000000"
+        "/stk/transactions/search?phoneNumber=%2B254700000000"
     )
 
     assert response.status_code == 200
@@ -475,7 +474,7 @@ def test_stk_push_zero_amount(client):
     response = client.post(
         "/stk/push",
         json={
-            "phoneNumber": "254719271870",
+            "phoneNumber": "+254719271870",
             "amount": 0,
             "accountReference": "TEST001",
             "transactionDescription": "Test payment"
@@ -505,7 +504,7 @@ def test_stk_push_missing_amount(client):
     response = client.post(
         "/stk/push",
         json={
-            "phoneNumber": "254719271870",
+            "phoneNumber": "+254719271870",
             "accountReference": "TEST001",
             "transactionDescription": "Test payment"
         }
@@ -520,7 +519,7 @@ def test_stk_push_missing_account_reference(client):
     response = client.post(
         "/stk/push",
         json={
-            "phoneNumber": "254719271870",
+            "phoneNumber": "+254719271870",
             "amount": 100,
             "transactionDescription": "Test payment"
         }
@@ -535,7 +534,7 @@ def test_stk_push_missing_transaction_description(client):
     response = client.post(
         "/stk/push",
         json={
-            "phoneNumber": "254719271870",
+            "phoneNumber": "+254719271870",
             "amount": 100,
             "accountReference": "TEST001"
         }
@@ -563,7 +562,7 @@ def test_stk_push_failed(client, monkeypatch):
     response = client.post(
         "/stk/push",
         json={
-            "phoneNumber": "254719271870",
+            "phoneNumber": "+254719271870",
             "amount": 100,
             "accountReference": "TEST001",
             "transactionDescription": "Test payment"
@@ -574,7 +573,7 @@ def test_stk_push_failed(client, monkeypatch):
 
     data = response.json()
 
-    assert data["phoneNumber"] == "254719271870"
+    assert data["phoneNumber"] == "+254719271870"
     assert data["amount"] == 100
     assert data["merchant_request_id"] == "TEST-MERCHANT-FAILED"
     assert data["checkout_request_id"] == "TEST-CHECKOUT-FAILED"
@@ -585,7 +584,7 @@ def test_stk_push_negative_amount(client):
     response = client.post(
         "/stk/push",
         json={
-            "phoneNumber": "254719271870",
+            "phoneNumber": "+254719271870",
             "amount": -100,
             "accountReference": "TEST001",
             "transactionDescription": "Test payment"
