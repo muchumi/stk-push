@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 class STKPushRequest(BaseModel):
@@ -30,3 +30,14 @@ class STKPushRequest(BaseModel):
         description="Description of the transaction",
         json_schema_extra={"example": "Payment For Goods"}
     )
+
+    @field_validator("phoneNumber")
+    @classmethod
+    def validate_phone_number(cls, value):
+        if not value.startswith("+254") or len(value) != 13:
+            raise ValueError("Invalid Kenyan phone number")
+
+        if not value[1:].isdigit():
+            raise ValueError("Invalid Kenyan phone number")
+
+        return value
