@@ -34,7 +34,7 @@ def test_stk_push(client, monkeypatch):
         }
     )
 
-    assert response.status_code == 200
+    assert response.status_code == 201
 
     data = response.json()
 
@@ -570,7 +570,7 @@ def test_stk_push_failed(client, monkeypatch):
         }
     )
 
-    assert response.status_code == 200
+    assert response.status_code == 201
 
     data = response.json()
 
@@ -578,3 +578,18 @@ def test_stk_push_failed(client, monkeypatch):
     assert data["amount"] == 100
     assert data["merchant_request_id"] == "TEST-MERCHANT-FAILED"
     assert data["checkout_request_id"] == "TEST-CHECKOUT-FAILED"
+
+# Testing STK push with negative amount
+def test_stk_push_negative_amount(client):
+
+    response = client.post(
+        "/stk/push",
+        json={
+            "phoneNumber": "254719271870",
+            "amount": -100,
+            "accountReference": "TEST001",
+            "transactionDescription": "Test payment"
+        }
+    )
+
+    assert response.status_code == 422
