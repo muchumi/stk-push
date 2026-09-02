@@ -52,7 +52,12 @@ async def stk_callback(request: Request, db: Session = Depends(get_db)):
             for item in metadata:
                 data[item["Name"]]=item.get("Value")
             transaction.status="success"
-            transaction.phoneNumber=data.get("PhoneNumber")
+            phoneNumber = data.get("PhoneNumber")
+            if phoneNumber:
+                phoneNumber = str(phoneNumber)
+                if phoneNumber.startswith("254"):
+                    phoneNumber = "+" + phoneNumber
+            transaction.phoneNumber = phoneNumber
             transaction.mpesa_receipt_number=data.get("MpesaReceiptNumber")
             transaction.transaction_date=data.get("TransactionDate")    
         else:
