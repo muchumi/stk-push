@@ -593,3 +593,19 @@ def test_stk_push_negative_amount(client):
     )
 
     assert response.status_code == 422
+
+
+# Testing STK push with invalid phone number
+def test_stk_push_invalid_phone_number(client):
+
+    response = client.post(
+        "/stk/push",
+        json={
+            "phoneNumber": "12345",
+            "amount": 100,
+            "accountReference": "TEST001",
+            "transactionDescription": "Test payment"
+        }
+    )
+
+    assert response.status_code == 422
