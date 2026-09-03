@@ -698,3 +698,66 @@ def test_stk_callback_success_missing_phone_number(client, db):
     assert transaction.phoneNumber == "+254719271870"
     assert transaction.mpesa_receipt_number == "TEST123ABC"
     assert transaction.transaction_date == 20260824123045
+
+
+# Testing successful STK callback with missing M-Pesa receipt number
+def test_stk_callback_success_missing_mpesa_receipt_number(client, db):
+
+    transaction = STKTransaction(
+        phoneNumber="+254719271870",
+        amount=100,
+        merchant_request_id="TEST-MERCHANT-NORECEIPT",
+        checkout_request_id="TEST-CHECKOUT-NORECEIPT",
+        status="pending"
+    )
+
+    db.add(transaction)
+    db.commit()
+    db.refresh(transaction)
+
+    callback_payload = {
+        "Body": {
+            "stkCallback": {
+                "MerchantRequestID": "TEST-MERCHANT-NORECEIPT",
+                "CheckoutRequestID": "TEST-CHECKOUT-NORECEIPT",
+                "ResultCode": 0,
+                "ResultDesc": "The service request is processed successfully.",
+                "CallbackMetadata": {
+                    "Item": [
+                        {
+                            "Name": "Amount",
+                            "Value": 100
+                        },
+                        {
+                            "Name": "TransactionDate",
+                            "Value": 20260824123045
+                        },
+                        {
+                            "Name": "PhoneNumber",
+                            "Value": "+254719271870"
+                        }
+                    ]
+                }
+            }
+        }
+    }
+
+    response = client.post(
+        "/stk/callback",
+        json=callback_payload
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert data["ResultCode"] == 0
+    assert data["ResultDesc"] == "Accepted"
+    assert data["message"] == "Callback received and processed successfully."
+
+    db.refresh(transaction)
+
+    assert transaction.status == "success"
+    assert transaction.phoneNumber == "+254719271870"
+    assert transaction.mpesa_receipt_number is None
+    assert transaction.transaction_date == 20260824123045
