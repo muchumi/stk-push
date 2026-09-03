@@ -617,7 +617,7 @@ def test_stk_callback_success_missing_callback_metadata(client, db):
         amount=100,
         merchant_request_id="TEST-MERCHANT-MISSING",
         checkout_request_id="TEST-CHECKOUT-MISSING",
-        status="Pending"
+        status="pending"
     )
     db.add(transaction)
     db.commit()
