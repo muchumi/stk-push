@@ -608,3 +608,30 @@ def test_stk_push_invalid_phone_number(client):
     )
 
     assert response.status_code == 422
+
+# Testing successful STK callback with missing callback metadata
+def test_stk_callback_success_missing_callback_metadata(client, db):
+    # Creating a transaction first
+    transaction = STKTransaction(
+        phoneNumber="+254719271870",
+        amount=100,
+        merchant_request_id="TEST-MERCHANT-MISSING",
+        checkout_request_id="TEST-CHECKOUT-MISSING",
+        status="Pending"
+    )
+    db.add(transaction)
+    db.commit()
+    db.refresh(transaction)
+
+    callback_payload={
+        "Body": {
+            "stkCallback": {
+                "MerchantRequestID": "TEST-MERCHANT-MISSING",
+                "CheckoutRequestID": "TEST-CHECKOUT-MISSING",
+                "ResultCode": 0,
+                "ResultDesc": "The service request is processed successfully."
+            }
+        }
+    }
+    response=client.post("/stk/callback", json=callback_payload)
+    assert response.status_code == 200
