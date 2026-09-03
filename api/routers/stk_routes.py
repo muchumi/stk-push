@@ -47,7 +47,7 @@ async def stk_callback(request: Request, db: Session = Depends(get_db)):
     transaction=(db.query(STKTransaction).filter(STKTransaction.checkout_request_id==checkout_request_id).first())
     if transaction:
         if result_code==0:
-            metadata=stk_callback["CallbackMetadata"]["Item"]
+            metadata=stk_callback.get("CallbackMetadata", {}).get("Item", [])
             data={}
             for item in metadata:
                 data[item["Name"]]=item.get("Value")
@@ -57,7 +57,7 @@ async def stk_callback(request: Request, db: Session = Depends(get_db)):
                 phoneNumber = str(phoneNumber)
                 if phoneNumber.startswith("254"):
                     phoneNumber = "+" + phoneNumber
-            transaction.phoneNumber = phoneNumber
+                transaction.phoneNumber = phoneNumber
             transaction.mpesa_receipt_number=data.get("MpesaReceiptNumber")
             transaction.transaction_date=data.get("TransactionDate")    
         else:
