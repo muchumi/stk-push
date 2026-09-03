@@ -761,3 +761,65 @@ def test_stk_callback_success_missing_mpesa_receipt_number(client, db):
     assert transaction.phoneNumber == "+254719271870"
     assert transaction.mpesa_receipt_number is None
     assert transaction.transaction_date == 20260824123045
+
+# Testing successful STK callback with missing transaction date
+def test_stk_callback_success_missing_transaction_date(client, db):
+
+    transaction = STKTransaction(
+        phoneNumber="+254719271870",
+        amount=100,
+        merchant_request_id="TEST-MERCHANT-NODATE",
+        checkout_request_id="TEST-CHECKOUT-NODATE",
+        status="pending"
+    )
+
+    db.add(transaction)
+    db.commit()
+    db.refresh(transaction)
+
+    callback_payload = {
+        "Body": {
+            "stkCallback": {
+                "MerchantRequestID": "TEST-MERCHANT-NODATE",
+                "CheckoutRequestID": "TEST-CHECKOUT-NODATE",
+                "ResultCode": 0,
+                "ResultDesc": "The service request is processed successfully.",
+                "CallbackMetadata": {
+                    "Item": [
+                        {
+                            "Name": "Amount",
+                            "Value": 100
+                        },
+                        {
+                            "Name": "MpesaReceiptNumber",
+                            "Value": "TEST123ABC"
+                        },
+                        {
+                            "Name": "PhoneNumber",
+                            "Value": "+254719271870"
+                        }
+                    ]
+                }
+            }
+        }
+    }
+
+    response = client.post(
+        "/stk/callback",
+        json=callback_payload
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert data["ResultCode"] == 0
+    assert data["ResultDesc"] == "Accepted"
+    assert data["message"] == "Callback received and processed successfully."
+
+    db.refresh(transaction)
+
+    assert transaction.status == "success"
+    assert transaction.phoneNumber == "+254719271870"
+    assert transaction.mpesa_receipt_number == "TEST123ABC"
+    assert transaction.transaction_date is None
