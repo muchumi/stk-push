@@ -29,6 +29,7 @@ def query_stk_status(checkout_request_id: str):
             timeout=30
         )
         response.raise_for_status()
+    return response.json()
     except requests.exceptions.RequestException as e:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
