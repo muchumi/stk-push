@@ -823,3 +823,5 @@ def test_stk_callback_success_missing_transaction_date(client, db):
     assert transaction.phoneNumber == "+254719271870"
     assert transaction.mpesa_receipt_number == "TEST123ABC"
     assert transaction.transaction_date is None
+
+
