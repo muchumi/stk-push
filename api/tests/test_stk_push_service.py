@@ -24,9 +24,7 @@ def test_initiate_stk_push(
 
     # Assert
     mock_get_access_token.assert_called_once()
-
     mock_generate_timestamp.assert_called_once()
-
     mock_generate_password.assert_called_once_with(
         "20260928190600"
     )
