@@ -36,6 +36,3 @@ def query_stk_status(checkout_request_id: str):
             detail=f"Failed to connect to Safaricom Daraja API: {str(e)}"
         )    
 
-  
-
-
