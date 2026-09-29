@@ -2,7 +2,6 @@ from unittest.mock import patch
 
 from api.services.stk_push import initiate_stk_push
 
-
 @patch("api.services.stk_push.generate_password")
 @patch("api.services.stk_push.generate_timestamp")
 @patch("api.services.stk_push.get_access_token")
